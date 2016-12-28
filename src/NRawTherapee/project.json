@@ -1,0 +1,28 @@
+{
+    "title": "NRawTherapee",
+    "authors": [ "Mike Morano <mmorano@mikeandwan.us>" ],
+    "description": ".Net wrapper for Raw Therapee",
+    "version": "0.1.0",
+    "packOptions": {
+        "licenseUrl": "https://github.com/AerisG222/NRawTherapee/blob/master/LICENSE.md",
+        "projectUrl": "https://github.com/AerisG222/NRawTherapee",
+        "summary": ".Net wrapper for Raw Therapee",
+        "tags": [ "raw", "Raw Therapee", "photography", "imaging" ]
+    },
+    "buildOptions": {
+        "debugType": "portable",
+        "warningsAsErrors": true
+    },
+    "frameworks": {
+        "net451": { },
+        "netstandard1.5": {
+            "dependencies": {
+                "NETStandard.Library": {
+                    "version": "1.6.0",
+                    "type": "platform"
+                },
+                "System.Diagnostics.Process": "4.1.0"
+            }
+        }
+    }
+}
