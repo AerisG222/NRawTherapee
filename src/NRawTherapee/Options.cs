@@ -1,30 +1,54 @@
 using System;
-using System.IO;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Text;
+using NRawTherapee.Pp3Source;
+using NRawTherapee.OutputFormat;
 
 
 namespace NRawTherapee
 {
     public class Options
     {
-        public string RawTherapeePath { get; set; }
-        public Format OutputFormat { get; set; }
-        public int JpgCompression { get; set; }
+        public string RawTherapeePath { get; set; } = "rawtherapee";
+        public IOutputFormat OutputFormat { get; set; } = new JpgOutputFormat();
         public string OutputFile { get; set; }
         public string OutputDirectory { get; set; }
         public bool Overwrite { get; set; }
         public bool DoOutputPp3 { get; set; }
-        public Pp3Source Pp3Source { get; set; }
-        public string UserSpecifiedPp3Source { get; set; }
+        public List<IPp3Source> Pp3Sources { get; } = new List<IPp3Source>();
 
 
-        public Options()
+        public void AddPp3Source(IPp3Source source) 
         {
-            RawTherapeePath = "rawtherapee";
-            OutputFormat = Format.JpgBestQuality;
+            Pp3Sources.Add(source);
         }
-        
+
+
+        public void AddApplicationDefaultPp3Source()
+        {
+            Pp3Sources.Add(new ApplicationDefaultPp3Source());
+        }
+
+
+        public void AddPerInputPp3Source()
+        {
+            Pp3Sources.Add(new PerInputPp3Source());
+        }
+
+
+        public void AddPerInputSkipIfMissingPp3Source()
+        {
+            Pp3Sources.Add(new PerInputSkipIfMissingPp3Source());
+        }
+
+
+        public void AddUserSpecifiedPp3Source(string source)
+        {
+            Pp3Sources.Add(new UserSpecifiedPp3Source(source));
+        }
+
         
         public ProcessStartInfo GetStartInfo(string rawFile)
         {
@@ -37,71 +61,22 @@ namespace NRawTherapee
             psi.RedirectStandardOutput = true;
             psi.RedirectStandardError = true;
             
-            StringBuilder args = new StringBuilder();
+            var args = new StringBuilder();
             
             if(DoOutputPp3) 
             {
-                args.Append($"-O {EscapeFilename(GetTargetOutputFilePath(rawFile))} ");
+                args.Append($"-O {PathUtils.QuoteFilename(GetTargetOutputFilePath(rawFile))} ");
             }
             else
             {
-                args.Append($"-o {EscapeFilename(GetTargetOutputFilePath(rawFile))} ");
-            }
-
-            switch(Pp3Source)
-            {
-                case Pp3Source.ApplicationDefault:
-                    args.Append("-d ");
-                    break;
-                case Pp3Source.PerInput:
-                    args.Append("-s ");
-                    break;
-                case Pp3Source.PerInputSkipIfNotExists:
-                    args.Append("-S ");
-                    break;
-                case Pp3Source.UserSpecified:
-                    args.Append($"-p {EscapeFilename(UserSpecifiedPp3Source)} ");
-                    break;
+                args.Append($"-o {PathUtils.QuoteFilename(GetTargetOutputFilePath(rawFile))} ");
             }
             
-            var jpgCompression = JpgCompression <= 0 || JpgCompression > 100 ? string.Empty : JpgCompression.ToString();
-            var jpgSwitch = $"-j{jpgCompression} ";
+            args.Append(OutputFormat.ToArgument());
 
-            switch(OutputFormat)
+            foreach(var source in Pp3Sources)
             {
-                case Format.JpgBestCompression:
-                    args.Append(jpgSwitch);
-                    args.Append("-js1 ");
-                    break;
-                case Format.JpgNormalCompression:
-                    args.Append(jpgSwitch);
-                    args.Append("-js2 ");
-                    break;
-                case Format.JpgBestQuality:
-                    args.Append(jpgSwitch);
-                    args.Append("-js3 ");
-                    break;
-                case Format.Png8Bit:
-                    args.Append("-b8 ");
-                    args.Append("-n ");
-                    break;
-                case Format.Png16Bit:
-                    args.Append("-n ");
-                    break;
-                case Format.Tiff8Bit:
-                    args.Append("-b8 ");
-                    args.Append("-t ");
-                    break;
-                case Format.Tiff8BitCompressed:
-                    args.Append("-b8 ");
-                    args.Append("-tz ");
-                    break;
-                case Format.Tiff16Bit:
-                    args.Append("-t ");
-                    break;
-                case Format.Tiff16BitCompressed:
-                    args.Append("-tz ");
-                    break;
+                args.Append(source.ToArgument());
             }
             
             if(Overwrite)
@@ -109,7 +84,7 @@ namespace NRawTherapee
                 args.Append("-Y ");
             }
 
-            args.Append($"-c {EscapeFilename(rawFile)}");
+            args.Append($"-c {PathUtils.QuoteFilename(rawFile)}");
             
             psi.Arguments = args.ToString();
             
@@ -124,43 +99,15 @@ namespace NRawTherapee
                 return OutputFile;
             }
 
-            var filename = Path.ChangeExtension(Path.GetFileName(inputFile), GetOutputExtension());
+            var filename = Path.ChangeExtension(Path.GetFileName(inputFile), OutputFormat.FileExtension);
 
             return Path.Combine(OutputDirectory, filename);
-        }
-
-        
-        string EscapeFilename(string file)
-        {
-            return $"\"{file}\"";
-        }
-
-
-        string GetOutputExtension()
-        {
-            switch(OutputFormat)
-            {
-                case Format.JpgBestCompression:
-                case Format.JpgNormalCompression:
-                case Format.JpgBestQuality:
-                    return ".jpg";
-                case Format.Png8Bit:
-                case Format.Png16Bit:
-                    return ".png";
-                case Format.Tiff8Bit:
-                case Format.Tiff8BitCompressed:
-                case Format.Tiff16Bit:
-                case Format.Tiff16BitCompressed:
-                    return ".tiff";
-            }
-
-            throw new InvalidOperationException("Format not handled!");
         }
 
 
         void Validate()
         {
-            if(OutputFormat == Format.None) 
+            if(OutputFormat == null) 
             {
                 throw new InvalidOperationException("You must specify an output format");
             }
@@ -181,19 +128,6 @@ namespace NRawTherapee
             if(!string.IsNullOrWhiteSpace(OutputDirectory) && !Directory.Exists(OutputDirectory))
             {
                 throw new InvalidOperationException("The output directory must exist before executing");
-            }
-
-            if(Pp3Source == Pp3Source.UserSpecified)
-            {
-                if(string.IsNullOrWhiteSpace(UserSpecifiedPp3Source))
-                {
-                    throw new InvalidOperationException("You must specify the .pp3 file to use when requesting the UserSpecified option");
-                }
-                
-                if(!File.Exists(UserSpecifiedPp3Source))
-                {
-                    throw new FileNotFoundException("The path to the specified .pp3 was not found", UserSpecifiedPp3Source);
-                }
             }
         }
     }

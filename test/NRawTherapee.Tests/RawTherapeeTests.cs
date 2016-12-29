@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Xunit;
+using NRawTherapee.OutputFormat;
 
 
 namespace NRawTherapee.Tests
@@ -40,23 +41,23 @@ namespace NRawTherapee.Tests
         {
             var opts = GetPreferredDefaultOptions();
             
-            opts.OutputFormat = Format.JpgBestCompression;
+            opts.OutputFormat = new JpgOutputFormat(JpgSubsampling.BestCompression, null);
             PrepareOutputDirectory(opts, "jpg1");
             ExecuteTest(opts);
 
-            opts.OutputFormat = Format.JpgNormalCompression;
+            opts.OutputFormat = new JpgOutputFormat(JpgSubsampling.NormalCompression, null);
             PrepareOutputDirectory(opts, "jpg2");
             ExecuteTest(opts);
 
-            opts.OutputFormat = Format.JpgBestQuality;
+            opts.OutputFormat = new JpgOutputFormat(JpgSubsampling.BestQuality, null);
             PrepareOutputDirectory(opts, "jpg3");
             ExecuteTest(opts);
 
-            opts.OutputFormat = Format.Png16Bit;
+            opts.OutputFormat = new PngOutputFormat(16);
             PrepareOutputDirectory(opts, "png16");
             ExecuteTest(opts);
 
-            opts.OutputFormat = Format.Png8Bit;
+            opts.OutputFormat = new PngOutputFormat(8);
             PrepareOutputDirectory(opts, "png8");
             ExecuteTest(opts);
         }
@@ -66,9 +67,11 @@ namespace NRawTherapee.Tests
         {
             var opts = new Options();
             
-            opts.OutputFormat = Format.JpgBestQuality;
-            opts.Pp3Source = Pp3Source.UserSpecified;
-            opts.UserSpecifiedPp3Source = "/usr/share/rawtherapee/profiles/Generic/Natural 1.pp3";
+            // default to a pre-specified profile
+            opts.AddUserSpecifiedPp3Source("/usr/share/rawtherapee/profiles/Generic/Natural 1.pp3");
+
+            // override the default with any customizations that exist for the input
+            opts.AddPerInputPp3Source();
             
             return opts;
         }
