@@ -15,7 +15,7 @@ namespace NRawTherapee.OutputFormat
         { 
             get
             {
-                return ".tiff";
+                return ".tif";
             }
         }
 

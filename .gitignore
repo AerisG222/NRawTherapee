@@ -4,3 +4,4 @@ project.lock.json
 test/NRawTherapee.Tests/noargs
 test/NRawTherapee.Tests/jpg*
 test/NRawTherapee.Tests/png*
+test/NRawTherapee.Tests/tif*

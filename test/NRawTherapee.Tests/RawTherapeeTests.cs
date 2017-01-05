@@ -41,6 +41,10 @@ namespace NRawTherapee.Tests
         {
             var opts = GetPreferredDefaultOptions();
             
+            opts.OutputFormat = new JpgOutputFormat();
+            PrepareOutputDirectory(opts, "jpg");
+            ExecuteTest(opts);
+
             opts.OutputFormat = new JpgOutputFormat(JpgSubsampling.BestCompression, null);
             PrepareOutputDirectory(opts, "jpg1");
             ExecuteTest(opts);
@@ -53,12 +57,36 @@ namespace NRawTherapee.Tests
             PrepareOutputDirectory(opts, "jpg3");
             ExecuteTest(opts);
 
+            opts.OutputFormat = new PngOutputFormat();
+            PrepareOutputDirectory(opts, "png");
+            ExecuteTest(opts);
+
             opts.OutputFormat = new PngOutputFormat(16);
             PrepareOutputDirectory(opts, "png16");
             ExecuteTest(opts);
 
             opts.OutputFormat = new PngOutputFormat(8);
             PrepareOutputDirectory(opts, "png8");
+            ExecuteTest(opts);
+
+            opts.OutputFormat = new TiffOutputFormat();
+            PrepareOutputDirectory(opts, "tif");
+            ExecuteTest(opts);
+
+            opts.OutputFormat = new TiffOutputFormat(16, false);
+            PrepareOutputDirectory(opts, "tif16");
+            ExecuteTest(opts);
+
+            opts.OutputFormat = new TiffOutputFormat(16, true);
+            PrepareOutputDirectory(opts, "tif16z");
+            ExecuteTest(opts);
+
+            opts.OutputFormat = new TiffOutputFormat(8, false);
+            PrepareOutputDirectory(opts, "tif8");
+            ExecuteTest(opts);
+
+            opts.OutputFormat = new TiffOutputFormat(8, true);
+            PrepareOutputDirectory(opts, "tif8z");
             ExecuteTest(opts);
         }
         
