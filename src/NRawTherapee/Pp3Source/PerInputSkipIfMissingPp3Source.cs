@@ -1,6 +1,3 @@
-using System;
-
-
 namespace NRawTherapee.Pp3Source
 {
     public class PerInputSkipIfMissingPp3Source
