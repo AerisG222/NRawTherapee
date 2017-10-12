@@ -11,7 +11,7 @@ namespace NRawTherapee
 {
     public class Options
     {
-        public string RawTherapeePath { get; set; } = "rawtherapee";
+        public string RawTherapeePath { get; set; } = "rawtherapee-cli";
         public IOutputFormat OutputFormat { get; set; } = new JpgOutputFormat();
         public string OutputFile { get; set; }
         public string OutputDirectory { get; set; }
@@ -50,45 +50,39 @@ namespace NRawTherapee
         }
 
         
-        public ProcessStartInfo GetStartInfo(string rawFile)
+        public string[] GetArguments(string rawFile)
         {
             Validate();
 
-            var psi = new ProcessStartInfo();
-            
-            psi.FileName = RawTherapeePath;
-            psi.UseShellExecute = false;
-            psi.RedirectStandardOutput = true;
-            psi.RedirectStandardError = true;
-            
-            var args = new StringBuilder();
+            var args = new List<string>();
             
             if(DoOutputPp3) 
             {
-                args.Append($"-O {PathUtils.QuoteFilename(GetTargetOutputFilePath(rawFile))} ");
+                args.Add("-O");
+                args.Add(GetTargetOutputFilePath(rawFile));
             }
             else
             {
-                args.Append($"-o {PathUtils.QuoteFilename(GetTargetOutputFilePath(rawFile))} ");
+                args.Add("-o");
+                args.Add(GetTargetOutputFilePath(rawFile));
             }
             
-            args.Append(OutputFormat.ToArgument());
+            args.AddRange(OutputFormat.ToArguments());
 
             foreach(var source in Pp3Sources)
             {
-                args.Append(source.ToArgument());
+                args.AddRange(source.ToArguments());
             }
             
             if(Overwrite)
             {
-                args.Append("-Y ");
+                args.Add("-Y");
             }
 
-            args.Append($"-c {PathUtils.QuoteFilename(rawFile)}");
+            args.Add("-c");
+            args.Add(rawFile);
             
-            psi.Arguments = args.ToString();
-            
-            return psi;
+            return args.ToArray();
         }
         
 

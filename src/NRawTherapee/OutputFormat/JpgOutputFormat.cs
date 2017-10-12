@@ -1,5 +1,5 @@
 using System;
-using System.Text;
+using System.Collections.Generic;
 
 
 namespace NRawTherapee.OutputFormat
@@ -7,6 +7,8 @@ namespace NRawTherapee.OutputFormat
     public class JpgOutputFormat
         : IOutputFormat
     {
+        const byte DEFAULT_JPG_QUALITY = 92;
+
         JpgSubsampling? Subsampling { get; set; }
         byte? Compression { get; set; }
 
@@ -41,17 +43,18 @@ namespace NRawTherapee.OutputFormat
         }
 
 
-        public string ToArgument()
+        public string[] ToArguments()
         {
-            var sb = new StringBuilder();
+            var args = new List<string>();
 
             if(Compression == null)
             {
-                sb.Append("-j ");
+                // rawtherapee-cli indicates 92 is the default, but when just passing -j now, quality is very low (1)
+                args.Add($"-j{DEFAULT_JPG_QUALITY}");
             }
             else
             {
-                sb.Append($"-j{Compression} ");
+                args.Add($"-j{Compression}");
             }
 
             if(Subsampling != null)
@@ -59,18 +62,18 @@ namespace NRawTherapee.OutputFormat
                 switch(Subsampling)
                 {
                     case JpgSubsampling.BestCompression:
-                        sb.Append("-js1 ");
+                        args.Add("-js1");
                         break;
                     case JpgSubsampling.NormalCompression:
-                        sb.Append("-js2 ");
+                        args.Add("-js2");
                         break;
                     case JpgSubsampling.BestQuality:
-                        sb.Append("-js3 ");
+                        args.Add("-js3");
                         break;
                 }
             }
 
-            return sb.ToString();
+            return args.ToArray();
         }
     }
 }

@@ -1,8 +1,8 @@
 using System;
 using System.ComponentModel;
 using System.IO;
-using System.Diagnostics;
 using System.Threading.Tasks;
+using Medallion.Shell;
 
 
 namespace NRawTherapee
@@ -35,39 +35,25 @@ namespace NRawTherapee
         }
         
         
-        // http://stackoverflow.com/questions/10788982/is-there-any-async-equivalent-of-process-start
-        Task<Result> RunProcessAsync(string fileName)
+        async Task<Result> RunProcessAsync(string fileName)
         {
-            var tcs = new TaskCompletionSource<Result>();
-            var process = new Process
-            {
-                StartInfo = Options.GetStartInfo(fileName),
-                EnableRaisingEvents = true
-            };
-
-            process.Exited += (sender, args) =>
-            {
-                var result = new Result {
-                    ExitCode = process.ExitCode,
-                    StandardOutput = process.StandardOutput.ReadToEnd(),
-                    StandardError = process.StandardError.ReadToEnd(),
-                    OutputFilename = Options.GetTargetOutputFilePath(fileName)
-                };
-                
-                tcs.SetResult(result);
-                process.Dispose();
-            };
-
             try
             {
-                process.Start();
+                var cmd = Command.Run(Options.RawTherapeePath, Options.GetArguments(fileName));
+                
+                await cmd.Task;
+
+                return new Result {
+                    ExitCode = cmd.Result.ExitCode,
+                    StandardOutput = await cmd.StandardOutput.ReadToEndAsync(),
+                    StandardError = await cmd.StandardError.ReadToEndAsync(),
+                    OutputFilename = Options.GetTargetOutputFilePath(fileName)
+                };
             }
             catch (Win32Exception ex)
             {
                 throw new Exception("Error when trying to start the rawtherapee process.  Please make sure rawtherapee is installed, and its path is properly specified in the options.", ex);
             }
-
-            return tcs.Task;
         }
     }
 }

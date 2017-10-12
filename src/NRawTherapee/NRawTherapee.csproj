@@ -1,9 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <Description>.Net wrapper for Raw Therapee</Description>
     <AssemblyTitle>NRawTherapee</AssemblyTitle>
-    <VersionPrefix>0.2.1</VersionPrefix>
+    <VersionPrefix>0.3.0</VersionPrefix>
     <Authors>Mike Morano &lt;mmorano@mikeandwan.us&gt;</Authors>
     <TargetFrameworks>netstandard1.6</TargetFrameworks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -13,11 +12,8 @@
     <PackageTags>raw;Raw Therapee;photography;imaging</PackageTags>
     <PackageProjectUrl>https://github.com/AerisG222/NRawTherapee</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/AerisG222/NRawTherapee/blob/master/LICENSE.md</PackageLicenseUrl>
-    <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.6' ">1.6.0</NetStandardImplicitPackageVersion>
   </PropertyGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
-    <PackageReference Include="System.Diagnostics.Process" Version="4.1.0" />
+  <ItemGroup>
+    <PackageReference Include="MedallionShell" Version="1.5.0" />
   </ItemGroup>
-
 </Project>

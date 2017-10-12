@@ -1,5 +1,5 @@
 using System;
-using System.Text;
+using System.Collections.Generic;
 
 
 namespace NRawTherapee.OutputFormat
@@ -40,18 +40,18 @@ namespace NRawTherapee.OutputFormat
         }
 
 
-        public string ToArgument()
+        public string[] ToArguments()
         {
-            var sb = new StringBuilder();
+            var args = new List<string>();
 
             if(Bits != null)
             {
-                sb.Append($"-b{Bits} ");
+                args.Add($"-b{Bits}");
             }
 
-            sb.Append("-n ");
+            args.Add("-n");
 
-            return sb.ToString();
+            return args.ToArray();
         }
     }
 }

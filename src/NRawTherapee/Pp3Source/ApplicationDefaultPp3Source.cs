@@ -3,9 +3,9 @@ namespace NRawTherapee.Pp3Source
     public class ApplicationDefaultPp3Source
         : IPp3Source
     {
-        public string ToArgument()
+        public string[] ToArguments()
         {
-            return "-d ";
+            return new string[] { "-d" };
         }
     }
 }

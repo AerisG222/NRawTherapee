@@ -26,9 +26,9 @@ namespace NRawTherapee.Pp3Source
         }
 
 
-        public string ToArgument()
+        public string[] ToArguments()
         {
-            return $"-p {PathUtils.QuoteFilename(Source)} ";
+            return new string[] { "-p", Source };
         }
     }
 }

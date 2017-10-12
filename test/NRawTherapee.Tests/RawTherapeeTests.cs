@@ -44,7 +44,7 @@ namespace NRawTherapee.Tests
             opts.OutputFormat = new JpgOutputFormat();
             PrepareOutputDirectory(opts, "jpg");
             ExecuteTest(opts);
-
+ 
             opts.OutputFormat = new JpgOutputFormat(JpgSubsampling.BestCompression, null);
             PrepareOutputDirectory(opts, "jpg1");
             ExecuteTest(opts);
@@ -55,6 +55,10 @@ namespace NRawTherapee.Tests
 
             opts.OutputFormat = new JpgOutputFormat(JpgSubsampling.BestQuality, null);
             PrepareOutputDirectory(opts, "jpg3");
+            ExecuteTest(opts);
+            
+            opts.OutputFormat = new JpgOutputFormat(null, 78);
+            PrepareOutputDirectory(opts, "jpg4");
             ExecuteTest(opts);
 
             opts.OutputFormat = new PngOutputFormat();
@@ -126,7 +130,7 @@ namespace NRawTherapee.Tests
                 
                 if(SHOW_COMMAND_LINES)
                 {
-                    Console.WriteLine($"cmdline: {opts.GetStartInfo(sourceFile).Arguments}");
+                    Console.WriteLine($"cmdline: {string.Join(' ', opts.GetArguments(sourceFile))}");
                 }
                 
                 var result = rt.Convert(sourceFile);
