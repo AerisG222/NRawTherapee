@@ -10,43 +10,43 @@ namespace NRawTherapee
     public class RawTherapee
     {
         public Options Options { get; private set; }
-        
-        
+
+
         public RawTherapee(Options options)
         {
             Options = options;
         }
-        
-        
+
+
         public Result Convert(string srcPath)
         {
             return ConvertAsync(srcPath).Result;
         }
-        
-        
+
+
         public Task<Result> ConvertAsync(string srcPath)
         {
             if(!File.Exists(srcPath))
             {
                 throw new FileNotFoundException("Please make sure the raw image exists.", srcPath);
             }
-            
+
             return RunProcessAsync(srcPath);
         }
-        
-        
+
+
         async Task<Result> RunProcessAsync(string fileName)
         {
             try
             {
                 var cmd = Command.Run(Options.RawTherapeePath, Options.GetArguments(fileName));
-                
-                await cmd.Task;
+
+                await cmd.Task.ConfigureAwait(false);
 
                 return new Result {
                     ExitCode = cmd.Result.ExitCode,
-                    StandardOutput = await cmd.StandardOutput.ReadToEndAsync(),
-                    StandardError = await cmd.StandardError.ReadToEndAsync(),
+                    StandardOutput = await cmd.StandardOutput.ReadToEndAsync().ConfigureAwait(false),
+                    StandardError = await cmd.StandardError.ReadToEndAsync().ConfigureAwait(false),
                     OutputFilename = Options.GetTargetOutputFilePath(fileName)
                 };
             }
