@@ -129,6 +129,9 @@ public class RawTherapeeTests
 
             Assert.True(File.Exists(result.OutputFilename));
 
+            Console.WriteLine($"OUT: {result.StandardOutput}");
+            Console.WriteLine($"ERR: {result.StandardError}");
+
             if(!KEEP_TEST_RESULTS)
             {
                 File.Delete(result.OutputFilename);

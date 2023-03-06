@@ -1,8 +1,9 @@
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
-using Medallion.Shell;
 
 namespace NRawTherapee;
 
@@ -34,14 +35,35 @@ public class RawTherapee
     {
         try
         {
-            var cmd = Command.Run(Options.RawTherapeePath, Options.GetArguments(fileName));
+            var stdOut = new StringBuilder();
+            var stdErr = new StringBuilder();
 
-            await cmd.Task.ConfigureAwait(false);
+            using var process = new Process();
+
+            process.StartInfo.FileName = Options.RawTherapeePath;
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.RedirectStandardError = true;
+            process.StartInfo.RedirectStandardOutput = true;
+
+            process.ErrorDataReceived += (sender, e) => stdErr.Append(e.Data);
+            process.OutputDataReceived += (sender, e) => stdOut.Append(e.Data);
+
+            foreach(var arg in Options.GetArguments(fileName))
+            {
+                process.StartInfo.ArgumentList.Add(arg);
+            }
+
+            process.Start();
+
+            process.BeginErrorReadLine();
+            process.BeginOutputReadLine();
+
+            await process.WaitForExitAsync().ConfigureAwait(false);
 
             return new Result {
-                ExitCode = cmd.Result.ExitCode,
-                StandardOutput = await cmd.StandardOutput.ReadToEndAsync().ConfigureAwait(false),
-                StandardError = await cmd.StandardError.ReadToEndAsync().ConfigureAwait(false),
+                ExitCode = process.ExitCode,
+                StandardOutput = stdOut.ToString(),
+                StandardError = stdErr.ToString(),
                 OutputFilename = Options.GetTargetOutputFilePath(fileName)
             };
         }

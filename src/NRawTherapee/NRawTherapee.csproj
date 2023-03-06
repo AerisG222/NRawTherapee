@@ -13,8 +13,4 @@
     <PackageProjectUrl>https://github.com/AerisG222/NRawTherapee</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/AerisG222/NRawTherapee/blob/master/LICENSE.md</PackageLicenseUrl>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="MedallionShell" Version="1.6.2" />
-  </ItemGroup>
 </Project>
