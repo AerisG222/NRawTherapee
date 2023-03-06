@@ -12,14 +12,14 @@ namespace NRawTherapee.Pp3Source
 
         public UserSpecifiedPp3Source(string source)
         {
-            if(string.IsNullOrWhiteSpace(source)) 
+            if(string.IsNullOrWhiteSpace(source))
             {
                 throw new ArgumentNullException(nameof(source));
             }
 
-            if(!File.Exists(source)) 
+            if(!File.Exists(source))
             {
-                throw new FileNotFoundException($"Specified .pp3 file was not found", source);
+                throw new FileNotFoundException($"Specified .pp3 file was not found: {source}", source);
             }
 
             Source = source;
