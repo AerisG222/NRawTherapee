@@ -1,11 +1,10 @@
-namespace NRawTherapee.Pp3Source
+namespace NRawTherapee.Pp3Source;
+
+public class PerInputPp3Source
+    : IPp3Source
 {
-    public class PerInputPp3Source
-        : IPp3Source
+    public string[] ToArguments()
     {
-        public string[] ToArguments()
-        {
-            return new string[] { "-s" };
-        }
+        return new string[] { "-s" };
     }
 }

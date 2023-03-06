@@ -1,11 +1,10 @@
-namespace NRawTherapee.Pp3Source
+namespace NRawTherapee.Pp3Source;
+
+public class PerInputSkipIfMissingPp3Source
+    : IPp3Source
 {
-    public class PerInputSkipIfMissingPp3Source
-        : IPp3Source
+    public string[] ToArguments()
     {
-        public string[] ToArguments()
-        {
-            return new string[] { "-S" };
-        }
+        return new string[] { "-S" };
     }
 }

@@ -4,56 +4,50 @@ using System.IO;
 using System.Threading.Tasks;
 using Medallion.Shell;
 
+namespace NRawTherapee;
 
-namespace NRawTherapee
+public class RawTherapee
 {
-    public class RawTherapee
+    public Options Options { get; private set; }
+
+    public RawTherapee(Options options)
     {
-        public Options Options { get; private set; }
+        Options = options;
+    }
 
+    public Result Convert(string srcPath)
+    {
+        return ConvertAsync(srcPath).Result;
+    }
 
-        public RawTherapee(Options options)
+    public Task<Result> ConvertAsync(string srcPath)
+    {
+        if(!File.Exists(srcPath))
         {
-            Options = options;
+            throw new FileNotFoundException("Please make sure the raw image exists.", srcPath);
         }
 
+        return RunProcessAsync(srcPath);
+    }
 
-        public Result Convert(string srcPath)
+    async Task<Result> RunProcessAsync(string fileName)
+    {
+        try
         {
-            return ConvertAsync(srcPath).Result;
+            var cmd = Command.Run(Options.RawTherapeePath, Options.GetArguments(fileName));
+
+            await cmd.Task.ConfigureAwait(false);
+
+            return new Result {
+                ExitCode = cmd.Result.ExitCode,
+                StandardOutput = await cmd.StandardOutput.ReadToEndAsync().ConfigureAwait(false),
+                StandardError = await cmd.StandardError.ReadToEndAsync().ConfigureAwait(false),
+                OutputFilename = Options.GetTargetOutputFilePath(fileName)
+            };
         }
-
-
-        public Task<Result> ConvertAsync(string srcPath)
+        catch (Win32Exception ex)
         {
-            if(!File.Exists(srcPath))
-            {
-                throw new FileNotFoundException("Please make sure the raw image exists.", srcPath);
-            }
-
-            return RunProcessAsync(srcPath);
-        }
-
-
-        async Task<Result> RunProcessAsync(string fileName)
-        {
-            try
-            {
-                var cmd = Command.Run(Options.RawTherapeePath, Options.GetArguments(fileName));
-
-                await cmd.Task.ConfigureAwait(false);
-
-                return new Result {
-                    ExitCode = cmd.Result.ExitCode,
-                    StandardOutput = await cmd.StandardOutput.ReadToEndAsync().ConfigureAwait(false),
-                    StandardError = await cmd.StandardError.ReadToEndAsync().ConfigureAwait(false),
-                    OutputFilename = Options.GetTargetOutputFilePath(fileName)
-                };
-            }
-            catch (Win32Exception ex)
-            {
-                throw new Exception("Error when trying to start the rawtherapee process.  Please make sure rawtherapee is installed, and its path is properly specified in the options.", ex);
-            }
+            throw new Exception("Error when trying to start the rawtherapee process.  Please make sure rawtherapee is installed, and its path is properly specified in the options.", ex);
         }
     }
 }

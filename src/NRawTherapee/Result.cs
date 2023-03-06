@@ -1,10 +1,9 @@
-namespace NRawTherapee
+namespace NRawTherapee;
+
+public class Result
 {
-    public class Result
-    {
-        public string StandardOutput { get; set; }
-        public string StandardError { get; set; }
-        public int ExitCode { get; set; }
-        public string OutputFilename { get; set; }
-    }
+    public string StandardOutput { get; set; }
+    public string StandardError { get; set; }
+    public int ExitCode { get; set; }
+    public string OutputFilename { get; set; }
 }

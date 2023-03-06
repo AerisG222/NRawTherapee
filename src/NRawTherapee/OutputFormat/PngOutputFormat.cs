@@ -1,57 +1,45 @@
 using System;
 using System.Collections.Generic;
 
+namespace NRawTherapee.OutputFormat;
 
-namespace NRawTherapee.OutputFormat
+public class PngOutputFormat
+    : IOutputFormat
 {
-    public class PngOutputFormat
-        : IOutputFormat
+    readonly short? _bits;
+
+    public string FileExtension => ".png";
+
+    public PngOutputFormat()
+        : this(null)
     {
-        short? Bits { get; set; }
 
+    }
 
-        public string FileExtension 
-        { 
-            get
+    public PngOutputFormat(short? bits)
+    {
+        if(bits != null)
+        {
+            if(!(bits == 8 || bits == 16))
             {
-                return ".png";
+                throw new ArgumentOutOfRangeException(nameof(bits), "bits must be either 8 or 16");
             }
         }
 
+        _bits = bits;
+    }
 
-        public PngOutputFormat()
-            : this(null)
+    public string[] ToArguments()
+    {
+        var args = new List<string>();
+
+        if(_bits != null)
         {
-
+            args.Add($"-b{_bits}");
         }
 
+        args.Add("-n");
 
-        public PngOutputFormat(short? bits)
-        {
-            if(bits != null)
-            {
-                if(!(bits == 8 || bits == 16))
-                {
-                    throw new ArgumentOutOfRangeException(nameof(bits), "bits must be either 8 or 16");
-                }
-            }
-
-            Bits = bits;
-        }
-
-
-        public string[] ToArguments()
-        {
-            var args = new List<string>();
-
-            if(Bits != null)
-            {
-                args.Add($"-b{Bits}");
-            }
-
-            args.Add("-n");
-
-            return args.ToArray();
-        }
+        return args.ToArray();
     }
 }

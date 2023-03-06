@@ -1,8 +1,7 @@
-namespace NRawTherapee.OutputFormat
+namespace NRawTherapee.OutputFormat;
+
+public interface IOutputFormat
 {
-    public interface IOutputFormat
-    {
-        string FileExtension { get; }
-        string[] ToArguments();
-    }
+    string FileExtension { get; }
+    string[] ToArguments();
 }

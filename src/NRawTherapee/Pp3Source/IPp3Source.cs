@@ -1,7 +1,6 @@
-namespace NRawTherapee.Pp3Source
+namespace NRawTherapee.Pp3Source;
+
+public interface IPp3Source
 {
-    public interface IPp3Source
-    {
-        string[] ToArguments();
-    }
+    string[] ToArguments();
 }

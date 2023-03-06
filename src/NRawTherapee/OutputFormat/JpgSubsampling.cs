@@ -1,9 +1,8 @@
-namespace NRawTherapee.OutputFormat
+namespace NRawTherapee.OutputFormat;
+
+public enum JpgSubsampling
 {
-    public enum JpgSubsampling
-    {
-        BestCompression,
-        NormalCompression,
-        BestQuality
-    }
+    BestCompression,
+    NormalCompression,
+    BestQuality
 }
