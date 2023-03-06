@@ -41,6 +41,7 @@ public class RawTherapee
             using var process = new Process();
 
             process.StartInfo.FileName = Options.RawTherapeePath;
+            process.StartInfo.CreateNoWindow = true;
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.RedirectStandardError = true;
             process.StartInfo.RedirectStandardOutput = true;
